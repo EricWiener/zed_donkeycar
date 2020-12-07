@@ -32,7 +32,7 @@ CAMERA_TYPE = "ZED"   # (PICAM|WEBCAM|CVCAM|CSIC|V4L|D435|MOCK|IMAGE_LIST)
 
 # ZED depth sensing cameras
 ZED_RGB = True       # True to capture RGB image
-ZED_DEPTH = False     # True to capture depth as image array
+ZED_DEPTH = True     # True to capture depth as image array
 ZED_IMU = False      # True to capture IMU data (ZED2 and ZED mini only)
 
 

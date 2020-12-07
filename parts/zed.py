@@ -205,12 +205,12 @@ class ZED(object):
                 self.zed.retrieve_measure(point_cloud, sl.MEASURE.XYZRGBA)
                 self.point_cloud = point_cloud.get_data()
 
-                if self.verbose:
+                if self.verbose and self.depth_image:
                     y, x = self.depth_image.shape
                     x = x // 2
                     y = y // 2
                     depth_value = self.depth_image[x, y]
-                    print("Distance to Camera at ({0}, {1}): {2} mm".format(x, y, depth_value))
+                    print("Distance to Camera at ({0}, {1}): {2} mm".format(x, y, depth_value), end="\r")
 
             if self.enable_imu:
                 sensors_data = sl.SensorsData()
@@ -343,7 +343,6 @@ if __name__ == "__main__":
                              depth_colormap)) if enable_depth else color_image
                     elif enable_depth:
                         images = depth_colormap
-                        images = depth_image
 
                     if images is not None:
                         cv2.imshow('ZED', images)

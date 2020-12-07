@@ -106,7 +106,6 @@ def drive(cfg, model_path=None, use_joystick=False, model_type=None, camera_type
             enable_imu=cfg.ZED_IMU,
             verbose=True
         )
-        # self.color_image, self.depth_image, self.point_cloud, self.imu_quaternion, self.linear_acceleration, self.angular_velocity, self.magnetic_field, self.barometer_pressure
         V.add(cam, inputs=[],
               outputs=['cam/image_array', 'cam/depth_array',
                        'pcd', 'imu/quaternion', 'imu/acl_linear', 'imu/ang_vel',

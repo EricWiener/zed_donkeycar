@@ -115,7 +115,7 @@ class ZED(object):
             zed_serial = self.zed.get_camera_information().serial_number
             print("Successfully connected to ZED {}".format(zed_serial))
 
-        time.sleep(2)  # let camera warm up
+        time.sleep(2.0)  # let camera warm up
 
         # initialize frame state
         self.color_image = None
@@ -181,7 +181,13 @@ class ZED(object):
                 self.zed.retrieve_image(image, sl.VIEW.LEFT)
 
                 # Get an np array from ZED Matrix
-                self.color_image = image.get_data()
+                rgba_np_image = image.get_data()
+
+                # Drop the alpha channel
+                rgb_np_image = rgba_np_image[:, :, :-1]
+
+                # Convert rgb to bgr
+                self.color_image = rgb_np_image[:, :, ::-1]
 
                 if self.verbose:
                     # Get the image timestamp
@@ -198,6 +204,13 @@ class ZED(object):
                 # Retrieve colored point cloud
                 self.zed.retrieve_measure(point_cloud, sl.MEASURE.XYZRGBA)
                 self.point_cloud = point_cloud.get_data()
+
+                if self.verbose:
+                    y, x = self.depth_image.shape
+                    x = x // 2
+                    y = y // 2
+                    depth_value = self.depth_image[x, y]
+                    print("Distance to Camera at ({0}, {1}): {2} mm".format(x, y, depth_value))
 
             if self.enable_imu:
                 sensors_data = sl.SensorsData()
@@ -286,6 +299,7 @@ if __name__ == "__main__":
             enable_rgb=enable_rgb,
             enable_depth=enable_depth,
             enable_imu=enable_imu,
+            verbose=True
         )
 
         frame_count = 0
@@ -314,7 +328,7 @@ if __name__ == "__main__":
 
             # Show images
             if show_opencv_window and not profile_frames:
-                cv2.namedWindow('ZED', cv2.WINDOW_AUTOSIZE)
+                # cv2.namedWindow('ZED', cv2.WINDOW_AUTOSIZE)
                 if enable_rgb or enable_depth:
                     # make sure depth and color images have same number of channels so we can show them together in the window
                     depth_colormap = cv2.applyColorMap(
@@ -329,6 +343,7 @@ if __name__ == "__main__":
                              depth_colormap)) if enable_depth else color_image
                     elif enable_depth:
                         images = depth_colormap
+                        images = depth_image
 
                     if images is not None:
                         cv2.imshow('ZED', images)

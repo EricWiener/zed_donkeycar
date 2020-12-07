@@ -20,7 +20,7 @@
 # MAX_LOOPS = None        # the vehicle loop can abort after this many iterations, when given a positive integer.
 # 
 # #CAMERA
-CAMERA_TYPE = "WEBCAM"   # (PICAM|WEBCAM|CVCAM|CSIC|V4L|D435|MOCK|IMAGE_LIST)
+CAMERA_TYPE = "ZED"   # (PICAM|WEBCAM|CVCAM|CSIC|V4L|D435|MOCK|IMAGE_LIST)
 # IMAGE_W = 160
 # IMAGE_H = 120
 # IMAGE_DEPTH = 3         # default RGB=3, make 1 for mono
@@ -29,7 +29,13 @@ CAMERA_TYPE = "WEBCAM"   # (PICAM|WEBCAM|CVCAM|CSIC|V4L|D435|MOCK|IMAGE_LIST)
 # CAMERA_HFLIP = False
 # # For CSIC camera - If the camera is mounted in a rotated position, changing the below parameter will correct the output frame orientation
 # CSIC_CAM_GSTREAMER_FLIP_PARM = 0 # (0 => none , 4 => Flip horizontally, 6 => Flip vertically)
-# 
+
+# ZED depth sensing cameras
+ZED_RGB = True       # True to capture RGB image
+ZED_DEPTH = False     # True to capture depth as image array
+ZED_IMU = False      # True to capture IMU data (ZED2 and ZED mini only)
+
+
 # # For IMAGE_LIST camera
 # # PATH_MASK = "~/mycar/data/tub_1_20-03-12/*.jpg"
 # 

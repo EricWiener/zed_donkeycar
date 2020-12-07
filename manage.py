@@ -98,6 +98,21 @@ def drive(cfg, model_path=None, use_joystick=False, model_type=None, camera_type
                        'imu/gyr_x', 'imu/gyr_y', 'imu/gyr_z'],
               threaded=True)
 
+    elif cfg.CAMERA_TYPE == "ZED":
+        from parts.zed import ZED
+        cam = ZED(
+            enable_rgb=cfg.ZED_RGB,
+            enable_depth=cfg.ZED_DEPTH,
+            enable_imu=cfg.ZED_IMU,
+            verbose=True
+        )
+        # self.color_image, self.depth_image, self.point_cloud, self.imu_quaternion, self.linear_acceleration, self.angular_velocity, self.magnetic_field, self.barometer_pressure
+        V.add(cam, inputs=[],
+              outputs=['cam/image_array', 'cam/depth_array',
+                       'pcd', 'imu/quaternion', 'imu/acl_linear', 'imu/ang_vel',
+                       'magnetic_field', 'barometer_pressure'],
+              threaded=True)
+
     else:
         if cfg.DONKEY_GYM:
             from donkeycar.parts.dgym import DonkeyGymEnv

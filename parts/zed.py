@@ -205,7 +205,7 @@ class ZED(object):
                 self.zed.retrieve_measure(point_cloud, sl.MEASURE.XYZRGBA)
                 self.point_cloud = point_cloud.get_data()
 
-                if self.verbose and self.depth_image:
+                if self.verbose and self.depth_image is not None:
                     y, x = self.depth_image.shape
                     x = x // 2
                     y = y // 2

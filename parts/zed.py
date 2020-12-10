@@ -61,6 +61,10 @@ def printSensorParameters(sensor_parameters):
             print("Random Walk: " + str(sensor_parameters.random_walk) + " " +
                   str(sensor_parameters.sensor_unit) + "/s/√Hz")
 
+# The default dimensions of the ZED
+WIDTH = 1920
+HEIGHT = 1080
+CHANNELS = 3
 
 class ZED(object):
     """
@@ -71,11 +75,22 @@ class ZED(object):
                  enable_rgb=True,
                  enable_depth=True,
                  enable_imu=False,
+                 width = WIDTH,
+                 height = HEIGHT,
+                 channels = CHANNELS,
                  verbose=False):
         self.verbose = verbose
         self.enable_imu = enable_imu
         self.enable_rgb = enable_rgb
         self.enable_depth = enable_depth
+
+        self.width = width
+        self.height = height
+        self.channels = channels
+        self.resize = (width != WIDTH) or (height != height) or (channels != CHANNELS)
+        if self.resize:
+            print("The output images will be resized from {} to {}.  This requires opencv.".format((WIDTH, HEIGHT, CHANNELS), (self.width, self.height, self.channels)))
+
 
         # Create a ZED camera object
         self.zed = sl.Camera()
@@ -194,7 +209,7 @@ class ZED(object):
                     timestamp = self.zed.get_timestamp(sl.TIME_REFERENCE.IMAGE)
                     print("Image resolution: {0} x {1} || Image timestamp: {2}\n".
                           format(image.get_width(), image.get_height(),
-                                timestamp.get_milliseconds()))
+                                timestamp.get_milliseconds()), end="\r")
 
             if self.enable_depth:
                 # Retrieve depth matrix. Depth is aligned on the left RGB image
@@ -211,6 +226,14 @@ class ZED(object):
                     y = y // 2
                     depth_value = self.depth_image[x, y]
                     print("Distance to Camera at ({0}, {1}): {2} mm".format(x, y, depth_value), end="\r")
+
+            if self.resize:
+                import cv2
+                if self.width != WIDTH or self.height != HEIGHT:
+                    self.color_image = cv2.resize(self.color_image, (self.width, self.height), cv2.INTER_NEAREST) if self.enable_rgb else None
+                    self.depth_image = cv2.resize(self.depth_image, (self.width, self.height), cv2.INTER_NEAREST) if self.enable_depth else None
+                if self.channels != CHANNELS:
+                    self.color_image = cv2.cvtColor(self.color_image, cv2.COLOR_BRG2GRAY) if self.enable_rgb else None
 
             if self.enable_imu:
                 sensors_data = sl.SensorsData()

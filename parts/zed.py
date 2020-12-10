@@ -202,7 +202,7 @@ class ZED(object):
                 rgb_np_image = rgba_np_image[:, :, :-1]
 
                 # Convert rgb to bgr
-                self.color_image = rgb_np_image[:, :, ::-1]
+                color_image = rgb_np_image[:, :, ::-1]
 
                 if self.verbose:
                     # Get the image timestamp
@@ -214,26 +214,29 @@ class ZED(object):
             if self.enable_depth:
                 # Retrieve depth matrix. Depth is aligned on the left RGB image
                 self.zed.retrieve_measure(depth, sl.MEASURE.DEPTH)
-                self.depth_image = depth.get_data()
+                depth_image = depth.get_data()
 
                 # Retrieve colored point cloud
                 self.zed.retrieve_measure(point_cloud, sl.MEASURE.XYZRGBA)
                 self.point_cloud = point_cloud.get_data()
 
-                if self.verbose and self.depth_image is not None:
-                    y, x = self.depth_image.shape
+                if self.verbose and depth_image is not None:
+                    y, x = depth_image.shape
                     x = x // 2
                     y = y // 2
-                    depth_value = self.depth_image[x, y]
+                    depth_value = depth_image[x, y]
                     print("Distance to Camera at ({0}, {1}): {2} mm".format(x, y, depth_value), end="\r")
 
             if self.resize:
                 import cv2
                 if self.width != WIDTH or self.height != HEIGHT:
-                    self.color_image = cv2.resize(self.color_image, (self.width, self.height), cv2.INTER_NEAREST) if self.enable_rgb else None
-                    self.depth_image = cv2.resize(self.depth_image, (self.width, self.height), cv2.INTER_NEAREST) if self.enable_depth else None
+                    color_image = cv2.resize(color_image, (self.width, self.height), cv2.INTER_NEAREST) if self.enable_rgb else None
+                    depth_image = cv2.resize(depth_image, (self.width, self.height), cv2.INTER_NEAREST) if self.enable_depth else None
                 if self.channels != CHANNELS:
-                    self.color_image = cv2.cvtColor(self.color_image, cv2.COLOR_BRG2GRAY) if self.enable_rgb else None
+                    color_image = cv2.cvtColor(color_image, cv2.COLOR_BRG2GRAY) if self.enable_rgb else None
+
+            self.color_image = color_image
+            self.depth_image = depth_image
 
             if self.enable_imu:
                 sensors_data = sl.SensorsData()
@@ -281,6 +284,8 @@ class ZED(object):
                   imu_quaternion: nparray(x:float, y:float, z:float, w: float), linear_acceleration: float, 
                   angular_velocity: float, magnetic_field: float, barometer_pressure: float)
         """
+        if self.color_image is None:
+            print("Returning color_image that is None")
         return self.color_image, self.depth_image, self.point_cloud, self.imu_quaternion, self.linear_acceleration, self.angular_velocity, self.magnetic_field, self.barometer_pressure
 
     def run(self):

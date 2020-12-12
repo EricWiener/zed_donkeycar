@@ -91,8 +91,7 @@ PCA9685_I2C_BUSNUM = 1
 # #between different neural network designs. You can override this setting by passing the command
 # #line parameter --type to the python manage.py train and drive commands.
 # DEFAULT_MODEL_TYPE = 'linear'   #(linear|categorical|tflite_linear|tensorrt_linear)
-# how many records to use when doing one pass of gradient decent. Use a smaller number if your gpu is running out of memory.
-BATCH_SIZE = 100
+# BATCH_SIZE = 128                #how many records to use when doing one pass of gradient decent. Use a smaller number if your gpu is running out of memory.
 # TRAIN_TEST_SPLIT = 0.8          #what percent of records to use for training. the remaining used for validation.
 # MAX_EPOCHS = 100                #how many times to visit all records of your data
 # SHOW_PLOT = True                #would you like to see a pop up display of final loss?
@@ -174,6 +173,15 @@ BATCH_SIZE = 100
 # # -- MacOS/Linux:please use 'ls /dev/tty.*' to find the correct serial port for mm1
 # #  eg.'/dev/tty.usbmodemXXXXXX' and replace the port accordingly
 # MM1_SERIAL_PORT = '/dev/ttyS0'  # Serial Port for reading and sending MM1 data.
+#
+# #TELEMETRY
+# TELEMETRY_DONKEY_NAME = 'my_robot1234'
+# TELEMETRY_PUBLISH_PERIOD = 1
+# HAVE_MQTT_TELEMETRY = False
+# TELEMETRY_MQTT_TOPIC_TEMPLATE = 'donkey/%s/telemetry'
+# TELEMETRY_MQTT_JSON_ENABLE = True
+# TELEMETRY_MQTT_BROKER_HOST = 'mqtt.eclipse.org'
+# TELEMETRY_MQTT_BROKER_PORT = 1883
 #
 # #RECORD OPTIONS
 # RECORD_DURING_AI = False        #normally we do not record during ai mode. Set this to true to get image and steering records for your Ai. Be careful not to use them to train.

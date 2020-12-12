@@ -619,7 +619,7 @@ def drive(cfg, model_path=None, use_joystick=False, model_type=None, camera_type
                    "behavior/one_hot_state_array"]
         types += ['int', 'str', 'vector']
 
-    if cfg.CAMERA_TYPE == "D435" and cfg.REALSENSE_D435_DEPTH or cfg.CAMERA_TYPE == "ZED":
+    if (cfg.CAMERA_TYPE == "D435" and cfg.REALSENSE_D435_DEPTH) or cfg.CAMERA_TYPE == "ZED":
         inputs += ['cam/depth_array']
         types += ['gray16_array']
 
@@ -640,6 +640,16 @@ def drive(cfg, model_path=None, use_joystick=False, model_type=None, camera_type
     tub_writer = TubWriter(tub_path, inputs=inputs, types=types, metadata=meta)
     V.add(tub_writer, inputs=inputs, outputs=[
           "tub/num_records"], run_condition='recording')
+
+    # Telemetry (we add the same metrics added to the TubHandler
+    if cfg.HAVE_MQTT_TELEMETRY:
+        from donkeycar.parts.telemetry import MqttTelemetry
+        published_inputs, published_types = MqttTelemetry.filter_supported_metrics(
+            inputs, types)
+        tel = MqttTelemetry(cfg, default_inputs=published_inputs,
+                            default_types=published_types)
+        V.add(tel, inputs=published_inputs, outputs=[
+              "tub/queue_size"], threaded=False)
 
     if cfg.PUB_CAMERA_IMAGES:
         from donkeycar.parts.network import TCPServeValue

@@ -12,7 +12,7 @@ Options:
 
 from docopt import docopt
 import donkeycar as dk
-from donkeycar.pipeline.training import train
+from torch.train import train
 
 
 def main():

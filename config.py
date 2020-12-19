@@ -101,6 +101,10 @@ HBRIDGE_PIN_RIGHT_BWD = 13
 #line parameter --type to the python manage.py train and drive commands.
 # (linear|categorical|tflite_linear|tensorrt_linear)
 DEFAULT_MODEL_TYPE = 'linear'
+
+# (tensorflow|pytorch)
+AI_FRAMEWORK = 'tensorflow'
+
 # how many records to use when doing one pass of gradient decent. Use a smaller number if your gpu is running out of memory.
 BATCH_SIZE = 128
 # what percent of records to use for training. the remaining used for validation.

@@ -360,6 +360,11 @@ def drive(cfg, model_path=None, use_joystick=False, model_type=None, camera_type
     else:
         inputs = ['cam/image_array']
 
+    def load_lightning_model(checkpoint_path):
+        from torch.DonkeyTorch18 import DonkeyTorch18
+        model = DonkeyTorch18.load_from_checkpoint(checkpoint_path)
+        return model
+
     def load_model(kl, model_path):
         start = time.time()
         print('loading model', model_path)
@@ -396,7 +401,10 @@ def drive(cfg, model_path=None, use_joystick=False, model_type=None, camera_type
 
         model_reload_cb = None
 
-        if '.h5' in model_path or '.uff' in model_path or 'tflite' in model_path or '.pkl' in model_path:
+        if cfg.AI_FRAMEWORK == 'pytorch':
+            torch_model = load_lightning_model(model_path)
+
+        elif '.h5' in model_path or '.uff' in model_path or 'tflite' in model_path or '.pkl' in model_path:
             #when we have a .h5 extension
             #load everything from the model file
             load_model(kl, model_path)
@@ -441,9 +449,14 @@ def drive(cfg, model_path=None, use_joystick=False, model_type=None, camera_type
         if cfg.TRAIN_LOCALIZER:
             outputs.append("pilot/loc")
 
-        V.add(kl, inputs=inputs,
-              outputs=outputs,
-              run_condition='run_pilot')
+        if cfg.AI_FRAMEWORK == 'pytorch':
+            V.add(torch_model, inputs=inputs,
+                outputs=outputs,
+                run_condition='run_pilot')
+        else:
+            V.add(kl, inputs=inputs,
+                outputs=outputs,
+                run_condition='run_pilot')
 
     if cfg.STOP_SIGN_DETECTOR:
         from donkeycar.parts.object_detector.stop_sign_detector import StopSignDetector
@@ -670,7 +683,7 @@ def drive(cfg, model_path=None, use_joystick=False, model_type=None, camera_type
         ctr.set_tub(tub_writer.tub)
         ctr.print_controls()
 
-    #run the vehicle for 20 seconds
+    #run the vehicle for 20 secdonds
     V.start(rate_hz=cfg.DRIVE_LOOP_HZ, max_loop_count=cfg.MAX_LOOPS)
 
 

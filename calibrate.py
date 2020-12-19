@@ -24,8 +24,7 @@ from donkeycar.utils import *
 
 from socket import gethostname
 
-
-def drive(cfg):
+def drive(cfg ):
     '''
     Construct a working robotic vehicle from many parts.
     Each part runs as a job in the Vehicle loop, calling either
@@ -59,18 +58,16 @@ def drive(cfg):
 
         from donkeycar.parts.actuator import PCA9685, PWMSteering, PWMThrottle
 
-        steering_controller = PCA9685(
-            cfg.STEERING_CHANNEL, cfg.PCA9685_I2C_ADDR, busnum=cfg.PCA9685_I2C_BUSNUM)
+        steering_controller = PCA9685(cfg.STEERING_CHANNEL, cfg.PCA9685_I2C_ADDR, busnum=cfg.PCA9685_I2C_BUSNUM)
         steering = PWMSteering(controller=steering_controller,
-                               left_pulse=cfg.STEERING_LEFT_PWM,
-                               right_pulse=cfg.STEERING_RIGHT_PWM)
+                                        left_pulse=cfg.STEERING_LEFT_PWM,
+                                        right_pulse=cfg.STEERING_RIGHT_PWM)
 
-        throttle_controller = PCA9685(
-            cfg.THROTTLE_CHANNEL, cfg.PCA9685_I2C_ADDR, busnum=cfg.PCA9685_I2C_BUSNUM)
+        throttle_controller = PCA9685(cfg.THROTTLE_CHANNEL, cfg.PCA9685_I2C_ADDR, busnum=cfg.PCA9685_I2C_BUSNUM)
         throttle = PWMThrottle(controller=throttle_controller,
-                               max_pulse=cfg.THROTTLE_FORWARD_PWM,
-                               zero_pulse=cfg.THROTTLE_STOPPED_PWM,
-                               min_pulse=cfg.THROTTLE_REVERSE_PWM)
+                                        max_pulse=cfg.THROTTLE_FORWARD_PWM,
+                                        zero_pulse=cfg.THROTTLE_STOPPED_PWM,
+                                        min_pulse=cfg.THROTTLE_REVERSE_PWM)
 
         drive_train = dict()
         drive_train['steering'] = steering
@@ -84,17 +81,17 @@ def drive(cfg):
         drive_train = RoboHATDriver(cfg)
         V.add(drive_train, inputs=['angle', 'throttle'])
 
+
     ctr.drive_train = drive_train
     ctr.drive_train_type = cfg.DRIVE_TRAIN_TYPE
-
+    
     class ShowHowTo:
         def __init__(self):
-            print(
-                f"Go to http://{gethostname()}.local:{ctr.port}/calibrate to calibrate ")
-
+            print(f"Go to http://{gethostname()}.local:{ctr.port}/calibrate to calibrate ")
+            
         def run(self):
             pass
-
+        
     V.add(ShowHowTo())
 
     #run the vehicle for 20 seconds

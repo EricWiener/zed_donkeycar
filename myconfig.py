@@ -20,7 +20,7 @@
 # MAX_LOOPS = None        # the vehicle loop can abort after this many iterations, when given a positive integer.
 #
 # #CAMERA
-CAMERA_TYPE = "ZED"   # (PICAM|WEBCAM|CVCAM|CSIC|V4L|D435|MOCK|IMAGE_LIST)
+CAMERA_TYPE = "ZED"   # (PICAM|WEBCAM|CVCAM|CSIC|V4L|D435|MOCK|IMAGE_LIST|ZED)
 # IMAGE_W = 160
 # IMAGE_H = 120
 # IMAGE_DEPTH = 3         # default RGB=3, make 1 for mono
@@ -180,7 +180,7 @@ PCA9685_I2C_BUSNUM = 1
 # HAVE_MQTT_TELEMETRY = False
 # TELEMETRY_MQTT_TOPIC_TEMPLATE = 'donkey/%s/telemetry'
 # TELEMETRY_MQTT_JSON_ENABLE = True
-# TELEMETRY_MQTT_BROKER_HOST = 'mqtt.eclipse.org'
+# TELEMETRY_MQTT_BROKER_HOST = 'broker.emqx.io'
 # TELEMETRY_MQTT_BROKER_PORT = 1883
 #
 # #RECORD OPTIONS

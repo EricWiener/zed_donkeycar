@@ -361,7 +361,7 @@ def drive(cfg, model_path=None, use_joystick=False, model_type=None, camera_type
         inputs = ['cam/image_array']
 
     def load_lightning_model(checkpoint_path):
-        from torch.DonkeyTorch18 import DonkeyTorch18
+        from torch_dc.DonkeyTorch18 import DonkeyTorch18
         model = DonkeyTorch18.load_from_checkpoint(checkpoint_path)
         return model
 

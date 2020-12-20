@@ -1,26 +1,24 @@
 import math
 import os
 from pathlib import Path
-from typing import List
+from typing import List, Any
 
-from donkeycar.parts.tflite import keras_model_to_tflite
-from donkeycar.pipeline.sequence import TubRecord
+from .types import TubRecord
 from donkeycar.pipeline.sequence import TubSequence
-from donkeycar.pipeline.types import TubDataset
+from .types import TubDataset
 from donkeycar.pipeline.augmentations import ImageAugmentation
 from donkeycar.utils import get_model_by_type, normalize_image
-import tensorflow as tf
 
 # PyTorch
+import torch
 from torch.utils.data import Dataset, DataLoader
 from donkeycar.parts.tub_v2 import Tub
-import torch
 
 # for get_default_transform
 from torchvision import transforms
 
 
-from DonkeyTorch18 import DonkeyTorch18
+from .DonkeyTorch18 import DonkeyTorch18
 import pytorch_lightning as pl
 
 
@@ -123,17 +121,13 @@ def train(cfg, tub_paths, model, model_type):
 
     tubs = tub_paths.split(',')
     tub_paths = [os.path.expanduser(tub) for tub in tubs]
-    train_type = 'linear' if 'linear' in model_type else model_type
-    
-    kl = get_model_by_type(train_type, cfg)
-    if cfg.PRINT_MODEL_SUMMARY:
-        print(kl.model.summary())
+    # train_type = 'linear' if 'linear' in model_type else model_type
 
     dataset = TorchTubDataset(cfg, tub_paths)
-    train_dataset, val_dataset = torch.utils.data.random_split(dataset, [50000, 10000])
-
-    train_size = len(train_dataset)
-    val_size = len(val_dataset)
+    train_size = int(len(dataset) * cfg.TRAIN_TEST_SPLIT)
+    val_size = len(dataset) - train_size
+    train_dataset, val_dataset = torch.utils.data.random_split(
+        dataset, [train_size, val_size])
 
     print('Records # Training %s' % train_size)
     print('Records # Validation %s' % val_size)
@@ -148,8 +142,10 @@ def train(cfg, tub_paths, model, model_type):
 
     if torch.cuda.is_available():
         print('Using CUDA')
+        gpus = -1
     else:
         print('Not using CUDA')
+        gpus = 0
 
 
     logger = None
@@ -160,8 +156,16 @@ def train(cfg, tub_paths, model, model_type):
         logger = TensorBoardLogger('tb_logs', name='DonkeyNet')
 
     output_dir = Path(model).parent
-    trainer = pl.Trainer(gpus=-1, logger=logger, progress_bar_refresh_rate=30, max_epochs=cfg.MAX_EPOCHS, default_root_dir=output_dir)
-    
+
+    cfg.MAX_EPOCHS = 3
+    trainer = pl.Trainer(gpus=gpus, logger=logger, progress_bar_refresh_rate=30,
+                         max_epochs=cfg.MAX_EPOCHS, default_root_dir=output_dir)
+    model = DonkeyTorch18(output_size=2)
+
+    if cfg.PRINT_MODEL_SUMMARY:
+        # print(kl.model.summary())
+        pass
+
     trainer.fit(model, data_loader['train'], data_loader['val'])
 
     # if is_torch_model:

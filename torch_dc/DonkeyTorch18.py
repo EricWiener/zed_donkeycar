@@ -16,10 +16,12 @@ def load_resnet18():
         layer.requires_grad = False
 
     # Change the classifier layer
-    model.fc = nn.Linear(1000, 2)
+    model.fc = nn.Linear(512, 2)
 
     for param in model.fc.parameters():
         param.requires_grad = True
+
+    return model
 
 
 class DonkeyTorch18(pl.LightningModule):
@@ -42,7 +44,7 @@ class DonkeyTorch18(pl.LightningModule):
     x, y = batch
     logits = self.model(x)
 
-    loss = F.cross_entropy(logits, y)
+    loss = F.l1_loss(logits, y)
     self.log('train_loss', loss)
 
     # Log Metrics
@@ -58,7 +60,7 @@ class DonkeyTorch18(pl.LightningModule):
   def validation_step(self, batch, batch_idx):
     x, y = batch
     logits = self.forward(x)
-    loss = F.cross_entropy(logits, y)
+    loss = F.l1_loss(logits, y)
 
     # Log Metrics
     self.log('val_loss', loss)

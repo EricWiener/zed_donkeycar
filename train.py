@@ -12,7 +12,7 @@ Options:
 
 from docopt import docopt
 import donkeycar as dk
-from torch.train import train
+from torch_dc.train import train
 
 
 def main():

@@ -4,7 +4,7 @@ Scripts to train a model using tensorflow or pytorch.
 Basic usage should feel familiar: train.py --tubs data/ --model models/mypilot.h5
 
 Usage:
-    train.py [--tubs=tubs] (--model=<model>) [--type=(linear|inferred|tensorrt_linear|tflite_linear)] [--framework=(tf|torch)]
+    train.py [--tubs=tubs] (--model=<model>) [--type=(linear|inferred|tensorrt_linear|tflite_linear)] [--framework=(tf|torch)] (--checkpoint=checkpoint)
 
 Options:
     -h --help              Show this screen.
@@ -27,7 +27,9 @@ def main():
         train(cfg, tubs, model, model_type)
     elif framework == 'torch':
         from donkeycar.parts.pytorch.torch_train import train
-        train(cfg, tubs, model, model_type)
+        checkpoint_path = args.get('--checkpoint', None)
+
+        train(cfg, tubs, model, model_type, checkpoint_path=checkpoint_path)
     else:
         print("Unrecognized framework: {}. Please specify one of 'tf' or 'torch'".format(
             framework))

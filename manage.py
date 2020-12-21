@@ -394,7 +394,8 @@ def drive(cfg, model_path=None, use_joystick=False, model_type=None, camera_type
         #When we have a model, first create an appropriate Keras part
 
         if cfg.AI_FRAMEWORK == 'pytorch':
-            torch_model = dk.parts.pytorch.torch_utils.get_model_by_type(model_type, cfg, model_path)
+            from donkeycar.parts.pytorch.torch_utils import get_model_by_type
+            torch_model = get_model_by_type(model_type, cfg, model_path)
         else:
             model_reload_cb = None
             kl = dk.utils.get_model_by_type(model_type, cfg)

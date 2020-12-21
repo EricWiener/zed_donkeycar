@@ -360,11 +360,6 @@ def drive(cfg, model_path=None, use_joystick=False, model_type=None, camera_type
     else:
         inputs = ['cam/image_array']
 
-    def load_lightning_model(checkpoint_path):
-        from torch_dc.DonkeyTorch18 import DonkeyTorch18
-        model = DonkeyTorch18.load_from_checkpoint(checkpoint_path)
-        return model
-
     def load_model(kl, model_path):
         start = time.time()
         print('loading model', model_path)
@@ -397,40 +392,40 @@ def drive(cfg, model_path=None, use_joystick=False, model_type=None, camera_type
 
     if model_path:
         #When we have a model, first create an appropriate Keras part
-        kl = dk.utils.get_model_by_type(model_type, cfg)
-
-        model_reload_cb = None
 
         if cfg.AI_FRAMEWORK == 'pytorch':
-            torch_model = load_lightning_model(model_path)
+            torch_model = dk.parts.pytorch.torch_utils.get_model_by_type(model_type, cfg, model_path)
+        else:
+            model_reload_cb = None
+            kl = dk.utils.get_model_by_type(model_type, cfg)
 
-        elif '.h5' in model_path or '.uff' in model_path or 'tflite' in model_path or '.pkl' in model_path:
-            #when we have a .h5 extension
-            #load everything from the model file
-            load_model(kl, model_path)
+            if '.h5' in model_path or '.uff' in model_path or 'tflite' in model_path or '.pkl' in model_path:
+                #when we have a .h5 extension
+                #load everything from the model file
+                load_model(kl, model_path)
 
-            def reload_model(filename):
-                load_model(kl, filename)
+                def reload_model(filename):
+                    load_model(kl, filename)
 
-            model_reload_cb = reload_model
+                model_reload_cb = reload_model
 
-        elif '.json' in model_path:
-            #when we have a .json extension
-            #load the model from there and look for a matching
-            #.wts file with just weights
-            load_model_json(kl, model_path)
-            weights_path = model_path.replace('.json', '.weights')
-            load_weights(kl, weights_path)
-
-            def reload_weights(filename):
-                weights_path = filename.replace('.json', '.weights')
+            elif '.json' in model_path:
+                #when we have a .json extension
+                #load the model from there and look for a matching
+                #.wts file with just weights
+                load_model_json(kl, model_path)
+                weights_path = model_path.replace('.json', '.weights')
                 load_weights(kl, weights_path)
 
-            model_reload_cb = reload_weights
+                def reload_weights(filename):
+                    weights_path = filename.replace('.json', '.weights')
+                    load_weights(kl, weights_path)
 
-        else:
-            print("ERR>> Unknown extension type on model file!!")
-            return
+                model_reload_cb = reload_weights
+
+            else:
+                print("ERR>> Unknown extension type on model file!!")
+                return
 
         #this part will signal visual LED, if connected
         V.add(FileWatcher(model_path, verbose=True),
